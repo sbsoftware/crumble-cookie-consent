@@ -3,9 +3,10 @@
 Cookie-consent support for [Crumble](https://github.com/sbsoftware/crumble).
 
 Requiring this shard keeps Crumble's essential session cookie scoped to the
-current browser session until the user gives consent. After consent, the same
+current browser session until the user makes a choice. After consent, the same
 cookie is reissued with the lifetime configured by the application. Applications
-can use `ctx.cookie_consented?` to guard optional cookie-dependent features.
+can use `ctx.cookie_consented?` to guard optional cookie-dependent features and
+`ctx.cookie_consent_chosen?` to distinguish denial from no choice yet.
 
 ## Installation
 
@@ -38,8 +39,8 @@ ToHtml.class_template do
 end
 ```
 
-The banner submits through `crumble-turbo`, records consent in the session, and
-removes itself after a successful submission. The typed CSS class
+The banner submits through `crumble-turbo`, records acceptance or denial in the
+session, and removes itself after a successful submission. The typed CSS class
 `Crumble::Cookie::Consent::Banner` is applied to its outer element for
 application styling. A default banner style is added to the layout automatically
 inside the `crumble-cookie-consent` cascade layer. Normal, unlayered application
