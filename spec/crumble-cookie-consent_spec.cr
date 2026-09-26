@@ -80,6 +80,7 @@ describe Crumble::Cookie::Consent do
       html.should contain(%(aria-label="Cookie-Einwilligung"))
       html.should contain("Diese Website verwendet Cookies, um optionale Funktionen bereitzustellen und deine Sitzung zu speichern.")
       html.should contain("Cookies akzeptieren")
+      html.should contain("Cookies ablehnen")
     end
 
     it "does not render the banner after consent" do

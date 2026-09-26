@@ -48,7 +48,7 @@ module Crumble::Cookie::Consent
               t.accept
             end
             button name: "consent", value: "false" do
-              "Deny cookies"
+              t.deny
             end
           end
         end
