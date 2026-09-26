@@ -58,17 +58,28 @@ describe Crumble::Cookie::Consent do
   end
 
   describe Crumble::Cookie::Consent::Action do
-    it "renders the fixed consent banner before consent" do
+    it "renders the fixed consent banner in English before consent" do
       ctx = ConfiguredCookieRequestContext.new
       html = Crumble::Cookie::Consent::Action.new(ctx).action_template.to_html
 
       html.should contain(%(class="#{Crumble::Cookie::Consent::Banner}"))
+      html.should contain(%(aria-label="Cookie consent"))
       html.should contain("This site uses cookies to provide optional features and remember your session.")
       html.should contain("Accept cookies")
       html.should contain("Deny cookies")
       html.should contain(%(name="consent" value="true"))
       html.should contain(%(name="consent" value="false"))
       html.should contain(%(action="#{Crumble::Cookie::Consent::Action.uri_path}"))
+    end
+
+    it "renders the fixed consent banner in German" do
+      headers = HTTP::Headers{"Accept-Language" => "de-DE,de;q=0.9,en;q=0.8"}
+      ctx = ConfiguredCookieRequestContext.new(headers: headers)
+      html = Crumble::Cookie::Consent::Action.new(ctx).action_template.to_html
+
+      html.should contain(%(aria-label="Cookie-Einwilligung"))
+      html.should contain("Diese Website verwendet Cookies, um optionale Funktionen bereitzustellen und deine Sitzung zu speichern.")
+      html.should contain("Cookies akzeptieren")
     end
 
     it "does not render the banner after consent" do

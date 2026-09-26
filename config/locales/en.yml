@@ -1,0 +1,18 @@
+en:
+  crumble:
+    cookie:
+      consent:
+        action:
+          template:
+            label: "Cookie consent"
+            message: "This site uses cookies to provide optional features and remember your session."
+            accept: "Accept cookies"
+de:
+  crumble:
+    cookie:
+      consent:
+        action:
+          template:
+            label: "Cookie-Einwilligung"
+            message: "Diese Website verwendet Cookies, um optionale Funktionen bereitzustellen und deine Sitzung zu speichern."
+            accept: "Cookies akzeptieren"
