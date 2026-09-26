@@ -9,9 +9,15 @@ crystal: '>= 1.20.3'
 license: MIT
 
 dependencies:
+  crababel:
+    github: sbsoftware/crababel
+    version: ">= 0.3.0"
   crumble:
     github: sbsoftware/crumble
     version: ">= 0.33.1"
   crumble-turbo:
     github: sbsoftware/crumble-turbo
     version: ">= 0.20.2"
+  http_accept:
+    github: BecauseOfProg/http_accept
+    version: ">= 0.1.0"

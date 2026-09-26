@@ -1,4 +1,13 @@
 module Crumble::Cookie::Consent
+  def self.locale_for(ctx)
+    locale = if accept_language = ctx.request.headers["Accept-Language"]?
+               HTTP::Accept::Language.best_locale(Crababel.locales, HTTP::Accept::Language.parse(accept_language), "en")
+             else
+               "en"
+             end
+    Crababel.locale(locale)
+  end
+
   css_class Banner
 
   style do
@@ -36,11 +45,12 @@ module Crumble::Cookie::Consent
 
     view do
       template do
-        aside Banner, role: "dialog", aria: {label: "Cookie consent"} do
-          p { "This site uses cookies to provide optional features and remember your session." }
+        translations = Crumble::Cookie::Consent.locale_for(ctx).crumble.cookie.consent.action.template
+        aside Banner, role: "dialog", aria: {label: translations.label} do
+          p { translations.message }
 
           action_form.to_html do
-            button { "Accept cookies" }
+            button { translations.accept }
           end
         end
       end
