@@ -52,6 +52,7 @@ describe Crumble::Cookie::Consent do
       ctx = ConfiguredCookieRequestContext.new(session_store: store)
 
       ctx.cookie_consented?.should be_false
+      ctx.cookie_consent_chosen?.should be_false
       store.has_key?(ctx.session_id).should be_false
     end
   end
@@ -65,6 +66,9 @@ describe Crumble::Cookie::Consent do
       html.should contain(%(aria-label="Cookie consent"))
       html.should contain("This site uses cookies to provide optional features and remember your session.")
       html.should contain("Accept cookies")
+      html.should contain("Deny cookies")
+      html.should contain(%(name="consent" value="true"))
+      html.should contain(%(name="consent" value="false"))
       html.should contain(%(action="#{Crumble::Cookie::Consent::Action.uri_path}"))
     end
 
@@ -76,6 +80,7 @@ describe Crumble::Cookie::Consent do
       html.should contain(%(aria-label="Cookie-Einwilligung"))
       html.should contain("Diese Website verwendet Cookies, um optionale Funktionen bereitzustellen und deine Sitzung zu speichern.")
       html.should contain("Cookies akzeptieren")
+      html.should contain("Cookies ablehnen")
     end
 
     it "does not render the banner after consent" do
@@ -88,6 +93,7 @@ describe Crumble::Cookie::Consent do
 
       Crumble::Cookie::Consent::Action.new(ctx).action_template.to_html.should be_empty
       ctx.cookie_consented?.should be_true
+      ctx.cookie_consent_chosen?.should be_true
     end
 
     it "persists consent and promotes the existing cookie" do
@@ -103,8 +109,10 @@ describe Crumble::Cookie::Consent do
         method: "POST",
         resource: Crumble::Cookie::Consent::Action.uri_path,
         headers: headers,
+        body: "consent=true",
         session_store: store,
       )
+      post_ctx.request.headers["Content-Type"] = "application/x-www-form-urlencoded"
 
       Crumble::Cookie::Consent::Action.handle(post_ctx).should be_true
       promoted_cookie = post_ctx.response.cookies[Crumble::Server::RequestContext::SESSION_COOKIE_NAME]
@@ -131,12 +139,31 @@ describe Crumble::Cookie::Consent do
         method: "POST",
         resource: Crumble::Cookie::Consent::Action.uri_path,
         headers: headers,
+        body: "consent=true",
         session_store: store,
       )
+      post_ctx.request.headers["Content-Type"] = "application/x-www-form-urlencoded"
 
       Crumble::Cookie::Consent::Action.handle(post_ctx).should be_true
 
       post_ctx.response.cookies[Crumble::Server::RequestContext::SESSION_COOKIE_NAME].max_age.should be_nil
+    end
+
+    it "persists denial and hides the banner" do
+      store = Crumble::Server::MemorySessionStore.new
+      initial_ctx = ConfiguredCookieRequestContext.new(session_store: store)
+      session_id = Crumble::Server::SessionKey.new(UUID.new(initial_ctx.response.cookies[Crumble::Server::RequestContext::SESSION_COOKIE_NAME].value))
+      headers = request_headers_with_session(session_id)
+      post_ctx = ConfiguredCookieRequestContext.new(method: "POST", resource: Crumble::Cookie::Consent::Action.uri_path, headers: headers, body: "consent=false", session_store: store)
+      post_ctx.request.headers["Content-Type"] = "application/x-www-form-urlencoded"
+
+      Crumble::Cookie::Consent::Action.handle(post_ctx).should be_true
+
+      store[session_id].__crumble_cookie_consented.should be_false
+      post_ctx.cookie_consented?.should be_false
+      post_ctx.cookie_consent_chosen?.should be_true
+      post_ctx.response.cookies[Crumble::Server::RequestContext::SESSION_COOKIE_NAME]?.should be_nil
+      Crumble::Cookie::Consent::Action.new(post_ctx).action_template.to_html.should be_empty
     end
   end
 
@@ -147,5 +174,13 @@ describe Crumble::Cookie::Consent do
     restored = Crumble::Server::Session.from_yaml(session.to_yaml)
 
     restored.__crumble_cookie_consented.should be_true
+  end
+
+  it "serializes denied consent separately from no choice" do
+    denied = Crumble::Server::Session.new
+    denied.__crumble_cookie_consented = false
+
+    Crumble::Server::Session.from_yaml(denied.to_yaml).__crumble_cookie_consented.should be_false
+    Crumble::Server::Session.from_yaml(Crumble::Server::Session.new.to_yaml).__crumble_cookie_consented.should be_nil
   end
 end
