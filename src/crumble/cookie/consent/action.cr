@@ -36,11 +36,11 @@ module Crumble::Cookie::Consent
 
     view do
       template do
-        aside Banner, role: "dialog", aria: {label: "Cookie consent"} do
-          p { "This site uses cookies to provide optional features and remember your session." }
+        aside Banner, role: "dialog", aria: {label: t.label} do
+          p { t.message }
 
           action_form.to_html do
-            button { "Accept cookies" }
+            button { t.accept }
           end
         end
       end
