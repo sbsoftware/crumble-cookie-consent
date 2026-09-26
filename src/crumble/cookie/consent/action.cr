@@ -23,24 +23,33 @@ module Crumble::Cookie::Consent
   end
 
   class Action < ::Crumble::Turbo::Action
+    form do
+      field consent : Bool
+    end
+
     controller do
-      ctx.session.update!(__crumble_cookie_consented: true)
-      ctx.refresh_session_cookie
+      ctx.session.update!(__crumble_cookie_consented: form.consent)
+      ctx.refresh_session_cookie if form.consent
     end
 
     policy do
       can_view do
-        !ctx.cookie_consented?
+        !ctx.cookie_consent_chosen?
       end
     end
 
     view do
       template do
-        aside Banner, role: "dialog", aria: {label: "Cookie consent"} do
-          p { "This site uses cookies to provide optional features and remember your session." }
+        aside Banner, role: "dialog", aria: {label: t.label} do
+          p { t.message }
 
           action_form.to_html do
-            button { "Accept cookies" }
+            button name: "consent", value: "true" do
+              t.accept
+            end
+            button name: "consent", value: "false" do
+              t.deny
+            end
           end
         end
       end

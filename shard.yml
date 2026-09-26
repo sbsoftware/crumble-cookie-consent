@@ -1,5 +1,5 @@
 name: crumble-cookie-consent
-version: 0.1.0
+version: 0.2.0
 
 authors:
   - Stefan Bilharz <stefan@sbsoftware.de>
@@ -9,9 +9,9 @@ crystal: '>= 1.20.3'
 license: MIT
 
 dependencies:
-  crumble:
-    github: sbsoftware/crumble
-    version: ">= 0.33.1"
-  crumble-turbo:
-    github: sbsoftware/crumble-turbo
-    version: ">= 0.20.2"
+  crababel:
+    github: sbsoftware/crababel
+    version: ">= 0.3.0"
+  hot-crumble:
+    github: sbsoftware/hot-crumble
+    version: ">= 0.5.1"
