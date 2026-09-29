@@ -33,7 +33,7 @@ ToHtml.class_template do
   html do
     body do
       yield
-      Crumble::Cookie::Consent::Action.new(ctx).action_template.to_html
+      Crumble::Cookie::Consent::Banner.new(ctx).to_html
     end
   end
 end
