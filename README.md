@@ -33,7 +33,7 @@ ToHtml.class_template do
   html do
     body do
       yield
-      Crumble::Cookie::Consent::Banner.new(ctx).to_html
+      Crumble::Cookie::Consent::BannerView.new(ctx).to_html
     end
   end
 end
@@ -41,11 +41,10 @@ end
 
 The banner submits through `crumble-turbo`, records acceptance or denial in the
 session, and removes itself after a successful submission. The typed CSS class
-`Crumble::Cookie::Consent::Banner::Container` is applied to its outer element
-for application styling. A default banner style is added to the layout
-automatically inside the `crumble-cookie-consent` cascade layer. Normal,
-unlayered application rules targeting
-`Crumble::Cookie::Consent::Banner::Container` take precedence over these
+`Crumble::Cookie::Consent::Banner` is applied to its outer element for
+application styling. A default banner style is added to the layout automatically
+inside the `crumble-cookie-consent` cascade layer. Normal, unlayered application
+rules targeting `Crumble::Cookie::Consent::Banner` take precedence over these
 defaults without requiring additional selector specificity.
 
 Configure the post-consent lifetime through Crumble's existing request-context

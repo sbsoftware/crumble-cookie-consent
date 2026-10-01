@@ -57,13 +57,13 @@ describe Crumble::Cookie::Consent do
     end
   end
 
-  describe Crumble::Cookie::Consent::Banner do
+  describe Crumble::Cookie::Consent::BannerView do
     it "renders the fixed consent banner in English before consent" do
       ctx = ConfiguredCookieRequestContext.new
-      html = Crumble::Cookie::Consent::Banner.new(ctx).to_html
+      html = Crumble::Cookie::Consent::BannerView.new(ctx).to_html
 
-      html.should contain(%(class="#{Crumble::Cookie::Consent::Banner::Container}"))
-      html.should contain(%(id="#{Crumble::Cookie::Consent::Banner::Id}"))
+      html.should contain(%(class="#{Crumble::Cookie::Consent::Banner}"))
+      html.should contain(%(id="#{Crumble::Cookie::Consent::BannerView::Id}"))
       html.should contain(%(aria-label="Cookie consent"))
       html.should contain("This site uses cookies to provide optional features and remember your session.")
       html.should contain("Accept cookies")
@@ -76,7 +76,7 @@ describe Crumble::Cookie::Consent do
     it "renders the fixed consent banner in German" do
       headers = HTTP::Headers{"Accept-Language" => "de-DE,de;q=0.9,en;q=0.8"}
       ctx = ConfiguredCookieRequestContext.new(headers: headers)
-      html = Crumble::Cookie::Consent::Banner.new(ctx).to_html
+      html = Crumble::Cookie::Consent::BannerView.new(ctx).to_html
 
       html.should contain(%(aria-label="Cookie-Einwilligung"))
       html.should contain("Diese Website verwendet Cookies, um optionale Funktionen bereitzustellen und deine Sitzung zu speichern.")
@@ -92,7 +92,7 @@ describe Crumble::Cookie::Consent do
       headers = request_headers_with_session(session.id)
       ctx = ConfiguredCookieRequestContext.new(headers: headers, session_store: store)
 
-      Crumble::Cookie::Consent::Banner.new(ctx).to_html.should be_empty
+      Crumble::Cookie::Consent::BannerView.new(ctx).to_html.should be_empty
       ctx.cookie_consented?.should be_true
       ctx.cookie_consent_chosen?.should be_true
     end
@@ -127,7 +127,7 @@ describe Crumble::Cookie::Consent do
 
       post_ctx.response.flush
       response_body.to_s.should contain(%(<turbo-stream action="replace"))
-      response_body.to_s.should contain(%(targets="##{Crumble::Cookie::Consent::Banner::Id}"))
+      response_body.to_s.should contain(%(targets="##{Crumble::Cookie::Consent::BannerView::Id}"))
       response_body.to_s.should contain("<template></template>")
     end
 
@@ -165,9 +165,9 @@ describe Crumble::Cookie::Consent do
       post_ctx.cookie_consented?.should be_false
       post_ctx.cookie_consent_chosen?.should be_true
       post_ctx.response.cookies[Crumble::Server::RequestContext::SESSION_COOKIE_NAME]?.should be_nil
-      Crumble::Cookie::Consent::Banner.new(post_ctx).to_html.should be_empty
+      Crumble::Cookie::Consent::BannerView.new(post_ctx).to_html.should be_empty
       post_ctx.response.flush
-      response_body.to_s.should contain(%(targets="##{Crumble::Cookie::Consent::Banner::Id}"))
+      response_body.to_s.should contain(%(targets="##{Crumble::Cookie::Consent::BannerView::Id}"))
       response_body.to_s.should contain("<template></template>")
     end
 

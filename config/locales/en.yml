@@ -2,7 +2,7 @@ en:
   crumble:
     cookie:
       consent:
-        banner:
+        banner_view:
           label: "Cookie consent"
           message: "This site uses cookies to provide optional features and remember your session."
           accept: "Accept cookies"
@@ -11,7 +11,7 @@ de:
   crumble:
     cookie:
       consent:
-        banner:
+        banner_view:
           label: "Cookie-Einwilligung"
           message: "Diese Website verwendet Cookies, um optionale Funktionen bereitzustellen und deine Sitzung zu speichern."
           accept: "Cookies akzeptieren"
