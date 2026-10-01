@@ -1,6 +1,8 @@
 module Crumble::Cookie::Consent
-  class Banner < CSS::Class
+  class Banner
     include ::Crumble::Crababel
+
+    css_class Container
 
     getter ctx : ::Crumble::Server::RequestContext | ::Crumble::Server::HandlerContext
 
@@ -18,7 +20,7 @@ module Crumble::Cookie::Consent
 
     ToHtml.instance_template do
       unless ctx.cookie_consent_chosen?
-        aside dom_id, Banner, role: "dialog", aria: {label: t.label} do
+        aside dom_id, Container, role: "dialog", aria: {label: t.label} do
           p { t.message }
 
           AcceptAction.new(ctx).action_form.to_html do
@@ -32,25 +34,25 @@ module Crumble::Cookie::Consent
     end
 
     include IdentifiableView
-  end
 
-  style do
-    layer :crumble_cookie_consent do
-      rule Banner do
-        position :fixed
-        left 0
-        right 0
-        bottom 0
-        display :flex
-        align_items :center
-        justify_content :space_between
-        gap 1.rem
-        box_sizing :border_box
-        padding 0.75.rem, 1.rem
-        background_color :white
-        color "#111827"
-        box_shadow 0.px, -0.125.rem, 0.5.rem, rgb(0, 0, 0, alpha: 15.percent)
-        z_index 2147483640
+    style do
+      layer :crumble_cookie_consent do
+        rule Container do
+          position :fixed
+          left 0
+          right 0
+          bottom 0
+          display :flex
+          align_items :center
+          justify_content :space_between
+          gap 1.rem
+          box_sizing :border_box
+          padding 0.75.rem, 1.rem
+          background_color :white
+          color "#111827"
+          box_shadow 0.px, -0.125.rem, 0.5.rem, rgb(0, 0, 0, alpha: 15.percent)
+          z_index 2147483640
+        end
       end
     end
   end

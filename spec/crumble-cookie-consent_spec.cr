@@ -62,7 +62,7 @@ describe Crumble::Cookie::Consent do
       ctx = ConfiguredCookieRequestContext.new
       html = Crumble::Cookie::Consent::Banner.new(ctx).to_html
 
-      html.should contain(%(class="#{Crumble::Cookie::Consent::Banner}"))
+      html.should contain(%(class="#{Crumble::Cookie::Consent::Banner::Container}"))
       html.should contain(%(id="#{Crumble::Cookie::Consent::Banner::Id}"))
       html.should contain(%(aria-label="Cookie consent"))
       html.should contain("This site uses cookies to provide optional features and remember your session.")
