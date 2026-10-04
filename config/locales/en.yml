@@ -16,3 +16,129 @@ de:
           message: "Diese Website verwendet Cookies, um optionale Funktionen bereitzustellen und deine Sitzung zu speichern."
           accept: "Cookies akzeptieren"
           deny: "Cookies ablehnen"
+es:
+  crumble:
+    cookie:
+      consent:
+        banner_view:
+          label: "Consentimiento de cookies"
+          message: "Este sitio utiliza cookies para ofrecer funciones opcionales y recordar tu sesión."
+          accept: "Aceptar cookies"
+          deny: "Rechazar cookies"
+fr:
+  crumble:
+    cookie:
+      consent:
+        banner_view:
+          label: "Consentement aux cookies"
+          message: "Ce site utilise des cookies pour fournir des fonctionnalités facultatives et mémoriser votre session."
+          accept: "Accepter les cookies"
+          deny: "Refuser les cookies"
+pt:
+  crumble:
+    cookie:
+      consent:
+        banner_view:
+          label: "Consentimento de cookies"
+          message: "Este site utiliza cookies para fornecer funcionalidades opcionais e memorizar a sua sessão."
+          accept: "Aceitar cookies"
+          deny: "Recusar cookies"
+tr:
+  crumble:
+    cookie:
+      consent:
+        banner_view:
+          label: "Çerez izni"
+          message: "Bu site, isteğe bağlı özellikler sunmak ve oturumunuzu hatırlamak için çerezleri kullanır."
+          accept: "Çerezleri kabul et"
+          deny: "Çerezleri reddet"
+pl:
+  crumble:
+    cookie:
+      consent:
+        banner_view:
+          label: "Zgoda na pliki cookie"
+          message: "Ta strona używa plików cookie, aby udostępniać opcjonalne funkcje i zapamiętywać sesję."
+          accept: "Akceptuj pliki cookie"
+          deny: "Odrzuć pliki cookie"
+cs:
+  crumble:
+    cookie:
+      consent:
+        banner_view:
+          label: "Souhlas se soubory cookie"
+          message: "Tento web používá soubory cookie k poskytování volitelných funkcí a zapamatování vaší relace."
+          accept: "Přijmout soubory cookie"
+          deny: "Odmítnout soubory cookie"
+it:
+  crumble:
+    cookie:
+      consent:
+        banner_view:
+          label: "Consenso ai cookie"
+          message: "Questo sito utilizza i cookie per offrire funzionalità facoltative e ricordare la tua sessione."
+          accept: "Accetta i cookie"
+          deny: "Rifiuta i cookie"
+ru:
+  crumble:
+    cookie:
+      consent:
+        banner_view:
+          label: "Согласие на использование файлов cookie"
+          message: "Этот сайт использует файлы cookie, чтобы предоставлять дополнительные функции и запоминать ваш сеанс."
+          accept: "Принять файлы cookie"
+          deny: "Отклонить файлы cookie"
+nl:
+  crumble:
+    cookie:
+      consent:
+        banner_view:
+          label: "Cookietoestemming"
+          message: "Deze site gebruikt cookies om optionele functies aan te bieden en je sessie te onthouden."
+          accept: "Cookies accepteren"
+          deny: "Cookies weigeren"
+ja:
+  crumble:
+    cookie:
+      consent:
+        banner_view:
+          label: "Cookieの使用に関する同意"
+          message: "このサイトでは、オプション機能の提供とセッションの記憶のためにCookieを使用します。"
+          accept: "Cookieを許可する"
+          deny: "Cookieを拒否する"
+zh:
+  crumble:
+    cookie:
+      consent:
+        banner_view:
+          label: "Cookie 使用许可"
+          message: "本网站使用 Cookie 来提供可选功能并记住您的会话。"
+          accept: "接受 Cookie"
+          deny: "拒绝 Cookie"
+ar:
+  crumble:
+    cookie:
+      consent:
+        banner_view:
+          label: "الموافقة على ملفات تعريف الارتباط"
+          message: "يستخدم هذا الموقع ملفات تعريف الارتباط لتوفير ميزات اختيارية وتذكّر جلستك."
+          accept: "قبول ملفات تعريف الارتباط"
+          deny: "رفض ملفات تعريف الارتباط"
+ko:
+  crumble:
+    cookie:
+      consent:
+        banner_view:
+          label: "쿠키 사용 동의"
+          message: "이 사이트는 선택 기능을 제공하고 세션을 기억하기 위해 쿠키를 사용합니다."
+          accept: "쿠키 허용"
+          deny: "쿠키 거부"
+vi:
+  crumble:
+    cookie:
+      consent:
+        banner_view:
+          label: "Chấp thuận cookie"
+          message: "Trang web này sử dụng cookie để cung cấp các tính năng tùy chọn và ghi nhớ phiên của bạn."
+          accept: "Chấp nhận cookie"
+          deny: "Từ chối cookie"
