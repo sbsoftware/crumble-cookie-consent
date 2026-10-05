@@ -58,6 +58,33 @@ describe Crumble::Cookie::Consent do
   end
 
   describe Crumble::Cookie::Consent::BannerView do
+    it "provides and negotiates every supported locale" do
+      expected_labels = {
+        "en" => "Cookie consent", "de" => "Cookie-Einwilligung", "es" => "Consentimiento de cookies", "fr" => "Consentement aux cookies",
+        "pt" => "Consentimento de cookies", "tr" => "Çerez izni", "pl" => "Zgoda na pliki cookie", "cs" => "Souhlas se soubory cookie",
+        "it" => "Consenso ai cookie", "ru" => "Согласие на использование файлов cookie", "nl" => "Cookietoestemming", "ja" => "Cookieの使用に関する同意",
+        "zh" => "Cookie 使用许可", "ar" => "الموافقة على ملفات تعريف الارتباط", "ko" => "쿠키 사용 동의", "vi" => "Chấp thuận cookie",
+      }
+
+      Crababel.locales.should eq(expected_labels.keys.sort)
+      expected_labels.each do |locale, label|
+        headers = HTTP::Headers{"Accept-Language" => locale}
+        ctx = ConfiguredCookieRequestContext.new(headers: headers)
+
+        Crumble::Crababel.locale_for(ctx).should eq(Crababel.locale(locale))
+        Crumble::Cookie::Consent::BannerView.new(ctx).to_html.should contain(%(aria-label="#{label}"))
+      end
+    end
+
+    it "negotiates regional language tags to their base translations" do
+      {"pt-BR" => "pt", "zh-Hans-CN" => "zh", "de-DE" => "de"}.each do |language, locale|
+        headers = HTTP::Headers{"Accept-Language" => language}
+        ctx = ConfiguredCookieRequestContext.new(headers: headers)
+
+        Crumble::Crababel.locale_for(ctx).should eq(Crababel.locale(locale))
+      end
+    end
+
     it "renders the fixed consent banner in English before consent" do
       ctx = ConfiguredCookieRequestContext.new
       html = Crumble::Cookie::Consent::BannerView.new(ctx).to_html
