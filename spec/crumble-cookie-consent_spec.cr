@@ -57,25 +57,53 @@ describe Crumble::Cookie::Consent do
     end
   end
 
-  describe Crumble::Cookie::Consent::Action do
+  describe Crumble::Cookie::Consent::BannerView do
+    it "provides and negotiates every supported locale" do
+      expected_labels = {
+        "en" => "Cookie consent", "de" => "Cookie-Einwilligung", "es" => "Consentimiento de cookies", "fr" => "Consentement aux cookies",
+        "pt" => "Consentimento de cookies", "tr" => "Çerez izni", "pl" => "Zgoda na pliki cookie", "cs" => "Souhlas se soubory cookie",
+        "it" => "Consenso ai cookie", "ru" => "Согласие на использование файлов cookie", "nl" => "Cookietoestemming", "ja" => "Cookieの使用に関する同意",
+        "zh" => "Cookie 使用许可", "ar" => "الموافقة على ملفات تعريف الارتباط", "ko" => "쿠키 사용 동의", "vi" => "Chấp thuận cookie",
+      }
+
+      Crababel.locales.should eq(expected_labels.keys.sort)
+      expected_labels.each do |locale, label|
+        headers = HTTP::Headers{"Accept-Language" => locale}
+        ctx = ConfiguredCookieRequestContext.new(headers: headers)
+
+        Crumble::Crababel.locale_for(ctx).should eq(Crababel.locale(locale))
+        Crumble::Cookie::Consent::BannerView.new(ctx).to_html.should contain(%(aria-label="#{label}"))
+      end
+    end
+
+    it "negotiates regional language tags to their base translations" do
+      {"pt-BR" => "pt", "zh-Hans-CN" => "zh", "de-DE" => "de"}.each do |language, locale|
+        headers = HTTP::Headers{"Accept-Language" => language}
+        ctx = ConfiguredCookieRequestContext.new(headers: headers)
+
+        Crumble::Crababel.locale_for(ctx).should eq(Crababel.locale(locale))
+      end
+    end
+
     it "renders the fixed consent banner in English before consent" do
       ctx = ConfiguredCookieRequestContext.new
-      html = Crumble::Cookie::Consent::Action.new(ctx).action_template.to_html
+      html = Crumble::Cookie::Consent::BannerView.new(ctx).to_html
 
       html.should contain(%(class="#{Crumble::Cookie::Consent::Banner}"))
+      html.should contain(%(id="#{Crumble::Cookie::Consent::BannerView::Id}"))
       html.should contain(%(aria-label="Cookie consent"))
       html.should contain("This site uses cookies to provide optional features and remember your session.")
       html.should contain("Accept cookies")
       html.should contain("Deny cookies")
-      html.should contain(%(name="consent" value="true"))
-      html.should contain(%(name="consent" value="false"))
-      html.should contain(%(action="#{Crumble::Cookie::Consent::Action.uri_path}"))
+      html.should contain(%(action="#{Crumble::Cookie::Consent::AcceptAction.uri_path}"))
+      html.should contain(%(action="#{Crumble::Cookie::Consent::DenyAction.uri_path}"))
+      html.should_not contain(%(name="consent"))
     end
 
     it "renders the fixed consent banner in German" do
       headers = HTTP::Headers{"Accept-Language" => "de-DE,de;q=0.9,en;q=0.8"}
       ctx = ConfiguredCookieRequestContext.new(headers: headers)
-      html = Crumble::Cookie::Consent::Action.new(ctx).action_template.to_html
+      html = Crumble::Cookie::Consent::BannerView.new(ctx).to_html
 
       html.should contain(%(aria-label="Cookie-Einwilligung"))
       html.should contain("Diese Website verwendet Cookies, um optionale Funktionen bereitzustellen und deine Sitzung zu speichern.")
@@ -91,7 +119,7 @@ describe Crumble::Cookie::Consent do
       headers = request_headers_with_session(session.id)
       ctx = ConfiguredCookieRequestContext.new(headers: headers, session_store: store)
 
-      Crumble::Cookie::Consent::Action.new(ctx).action_template.to_html.should be_empty
+      Crumble::Cookie::Consent::BannerView.new(ctx).to_html.should be_empty
       ctx.cookie_consented?.should be_true
       ctx.cookie_consent_chosen?.should be_true
     end
@@ -107,14 +135,14 @@ describe Crumble::Cookie::Consent do
       post_ctx = ConfiguredCookieRequestContext.new(
         response_io: response_body,
         method: "POST",
-        resource: Crumble::Cookie::Consent::Action.uri_path,
+        resource: Crumble::Cookie::Consent::AcceptAction.uri_path,
         headers: headers,
-        body: "consent=true",
+        body: "consent=false",
         session_store: store,
       )
       post_ctx.request.headers["Content-Type"] = "application/x-www-form-urlencoded"
 
-      Crumble::Cookie::Consent::Action.handle(post_ctx).should be_true
+      Crumble::Cookie::Consent::AcceptAction.handle(post_ctx).should be_true
       promoted_cookie = post_ctx.response.cookies[Crumble::Server::RequestContext::SESSION_COOKIE_NAME]
 
       store[session_id].__crumble_cookie_consented.should be_true
@@ -126,6 +154,7 @@ describe Crumble::Cookie::Consent do
 
       post_ctx.response.flush
       response_body.to_s.should contain(%(<turbo-stream action="replace"))
+      response_body.to_s.should contain(%(targets="##{Crumble::Cookie::Consent::BannerView::Id}"))
       response_body.to_s.should contain("<template></template>")
     end
 
@@ -137,14 +166,13 @@ describe Crumble::Cookie::Consent do
       headers = request_headers_with_session(session_id)
       post_ctx = Crumble::Server::TestRequestContext.new(
         method: "POST",
-        resource: Crumble::Cookie::Consent::Action.uri_path,
+        resource: Crumble::Cookie::Consent::AcceptAction.uri_path,
         headers: headers,
-        body: "consent=true",
         session_store: store,
       )
       post_ctx.request.headers["Content-Type"] = "application/x-www-form-urlencoded"
 
-      Crumble::Cookie::Consent::Action.handle(post_ctx).should be_true
+      Crumble::Cookie::Consent::AcceptAction.handle(post_ctx).should be_true
 
       post_ctx.response.cookies[Crumble::Server::RequestContext::SESSION_COOKIE_NAME].max_age.should be_nil
     end
@@ -154,16 +182,35 @@ describe Crumble::Cookie::Consent do
       initial_ctx = ConfiguredCookieRequestContext.new(session_store: store)
       session_id = Crumble::Server::SessionKey.new(UUID.new(initial_ctx.response.cookies[Crumble::Server::RequestContext::SESSION_COOKIE_NAME].value))
       headers = request_headers_with_session(session_id)
-      post_ctx = ConfiguredCookieRequestContext.new(method: "POST", resource: Crumble::Cookie::Consent::Action.uri_path, headers: headers, body: "consent=false", session_store: store)
+      response_body = IO::Memory.new
+      post_ctx = ConfiguredCookieRequestContext.new(response_io: response_body, method: "POST", resource: Crumble::Cookie::Consent::DenyAction.uri_path, headers: headers, body: "consent=true", session_store: store)
       post_ctx.request.headers["Content-Type"] = "application/x-www-form-urlencoded"
 
-      Crumble::Cookie::Consent::Action.handle(post_ctx).should be_true
+      Crumble::Cookie::Consent::DenyAction.handle(post_ctx).should be_true
 
       store[session_id].__crumble_cookie_consented.should be_false
       post_ctx.cookie_consented?.should be_false
       post_ctx.cookie_consent_chosen?.should be_true
       post_ctx.response.cookies[Crumble::Server::RequestContext::SESSION_COOKIE_NAME]?.should be_nil
-      Crumble::Cookie::Consent::Action.new(post_ctx).action_template.to_html.should be_empty
+      Crumble::Cookie::Consent::BannerView.new(post_ctx).to_html.should be_empty
+      post_ctx.response.flush
+      response_body.to_s.should contain(%(targets="##{Crumble::Cookie::Consent::BannerView::Id}"))
+      response_body.to_s.should contain("<template></template>")
+    end
+
+    it "rejects a repeated choice" do
+      store = Crumble::Server::MemorySessionStore.new
+      session = Crumble::Server::Session.new
+      session.__crumble_cookie_consented = false
+      store.set(session)
+      headers = request_headers_with_session(session.id)
+      ctx = ConfiguredCookieRequestContext.new(method: "POST", resource: Crumble::Cookie::Consent::AcceptAction.uri_path, headers: headers, session_store: store)
+
+      Crumble::Cookie::Consent::AcceptAction.handle(ctx).should be_true
+
+      ctx.response.status_code.should eq(403)
+      store[session.id].__crumble_cookie_consented.should be_false
+      ctx.response.cookies[Crumble::Server::RequestContext::SESSION_COOKIE_NAME]?.should be_nil
     end
   end
 
