@@ -88,3 +88,15 @@ module Crumble::Cookie::Consent
     end
   end
 end
+
+# Consent actions only render forms in BannerView and stream that view after submission,
+# but their generated templates still need to satisfy IdentifiableView's interface.
+class Crumble::Cookie::Consent::AcceptAction::Template
+  ToHtml.instance_template do
+  end
+end
+
+class Crumble::Cookie::Consent::DenyAction::Template
+  ToHtml.instance_template do
+  end
+end
