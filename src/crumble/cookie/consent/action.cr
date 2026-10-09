@@ -76,27 +76,27 @@ module Crumble::Cookie::Consent
     abstract def consent : Bool
   end
 
+  # These form-only actions stream BannerView, but their generated templates still
+  # need empty renderers to satisfy IdentifiableView's interface.
   class AcceptAction < Action
+    view do
+      template do
+      end
+    end
+
     def consent : Bool
       true
     end
   end
 
   class DenyAction < Action
+    view do
+      template do
+      end
+    end
+
     def consent : Bool
       false
     end
-  end
-end
-
-# Consent actions only render forms in BannerView and stream that view after submission,
-# but their generated templates still need to satisfy IdentifiableView's interface.
-class Crumble::Cookie::Consent::AcceptAction::Template
-  ToHtml.instance_template do
-  end
-end
-
-class Crumble::Cookie::Consent::DenyAction::Template
-  ToHtml.instance_template do
   end
 end
