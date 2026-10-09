@@ -76,13 +76,25 @@ module Crumble::Cookie::Consent
     abstract def consent : Bool
   end
 
+  # These form-only actions stream BannerView, but their generated templates still
+  # need empty renderers to satisfy IdentifiableView's interface.
   class AcceptAction < Action
+    view do
+      template do
+      end
+    end
+
     def consent : Bool
       true
     end
   end
 
   class DenyAction < Action
+    view do
+      template do
+      end
+    end
+
     def consent : Bool
       false
     end

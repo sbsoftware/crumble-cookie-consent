@@ -214,6 +214,15 @@ describe Crumble::Cookie::Consent do
     end
   end
 
+  describe "action templates" do
+    it "provides empty templates for form-only consent actions" do
+      ctx = ConfiguredCookieRequestContext.new
+
+      Crumble::Cookie::Consent::AcceptAction.new(ctx).action_template.to_html.should eq(%(<div id="#{Crumble::Cookie::Consent::AcceptAction::Template::Id}"></div>))
+      Crumble::Cookie::Consent::DenyAction.new(ctx).action_template.to_html.should eq(%(<div id="#{Crumble::Cookie::Consent::DenyAction::Template::Id}"></div>))
+    end
+  end
+
   it "serializes the consent state with the session" do
     session = Crumble::Server::Session.new
     session.__crumble_cookie_consented = true
